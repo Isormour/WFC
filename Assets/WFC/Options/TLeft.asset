@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd21f45a011555428e0b7648138a79c, type: 3}
+  m_Name: TLeft
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 7018262228648139126, guid: 6df972ceb1352fa4b9099154f6c09bc6, type: 3}
+  Condition:
+    Top: 2
+    Bottom: 3
+    Left: 4
+    Right: 0
