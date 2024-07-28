@@ -18,9 +18,3 @@ MonoBehaviour:
     Bottom: 1
     Left: 1
     Right: 0
-  ConditionGroup:
-  - ConditionRows:
-    - Top: 1
-      Bottom: 1
-      Left: 1
-      Right: 0

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prefab: {fileID: 8955380377237878220, guid: 05bb251dee9eb5d48938f329a205aa0a, type: 3}
   Condition:
-    Top: 3
+    Top: 0
     Bottom: 3
     Left: 1
     Right: 3

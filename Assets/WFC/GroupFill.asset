@@ -13,15 +13,7 @@ MonoBehaviour:
   m_Name: GroupFill
   m_EditorClassIdentifier: 
   Group:
-  - {fileID: 11400000, guid: 8169bbb1d462d1c459101be9f6199275, type: 2}
-  - {fileID: 11400000, guid: aae90e860000d174997671f8e05e1df9, type: 2}
-  - {fileID: 11400000, guid: 9a289bfb772212d469a67285bfc9e1ee, type: 2}
-  - {fileID: 11400000, guid: dbb263395a10fa6479d9ce10f1fe8719, type: 2}
-  - {fileID: 11400000, guid: d4f378588488f7443ac7435a2a7c204e, type: 2}
-  - {fileID: 11400000, guid: d5ce209aab30eec4ca3bba37157992eb, type: 2}
-  - {fileID: 11400000, guid: bb048fcb4ae12b048ae2728d198f5fd9, type: 2}
-  - {fileID: 11400000, guid: 3ac5703ff80edd54f92b4034f422a852, type: 2}
-  - {fileID: 11400000, guid: cd59d689eaa63104db6a227cee281cc2, type: 2}
-  - {fileID: 11400000, guid: dcf965fbbf9c1014f9bf25bcf808e4d9, type: 2}
-  - {fileID: 11400000, guid: 4874b74ca156f7e44be2b59894dbe3c0, type: 2}
-  - {fileID: 11400000, guid: 191ed86d9b67ba246abbdd3ca2e0cf5e, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
