@@ -10,7 +10,8 @@ public enum ECellDirection
 }
 public class Cell
 {
-    int x, y;
+    public int x { private set; get; }
+    public int y { private set; get; }
     Cell top;
     Cell bottom;
     Cell left;
@@ -36,6 +37,27 @@ public class Cell
         this.bottom = bottom;
         this.right = right;
         this.left = left;
+    }
+    public List<Cell> GetNeibhoursWithCondition(ECondition cond)
+    {
+        List<Cell> neibhours = new List<Cell>();
+        if (top != null && condition.Top == cond &&top.condition.Bottom == cond)
+        {
+            neibhours.Add(top);
+        }
+        if (bottom != null && condition.Bottom == cond && bottom.condition.Top == cond)
+        {
+            neibhours.Add(bottom);
+        }
+        if (left != null && condition.Left == cond && left.condition.Right == cond)
+        {
+            neibhours.Add(left);
+        }
+        if (right != null && condition.Right == cond && right.condition.Left == cond)
+        {
+            neibhours.Add(right);
+        }
+        return neibhours;
     }
     public void Collapse(Transform parent, CollapseOption[] options)
     {
@@ -89,7 +111,6 @@ public class Cell
     }
     ECondition CheckNeighbhourCondition(Cell cell, ECellDirection dir)
     {
-        ECondition Result = ECondition.Any;
         ECondition cellCondition = ECondition.Any;
         if (cell == null || cell.condition == null)
         {
@@ -112,31 +133,6 @@ public class Cell
             default:
                 break;
         }
-        switch (cellCondition)
-        {
-            case ECondition.None:
-                Result = ECondition.None;
-                break;
-            case ECondition.Any:
-                Result = ECondition.Any;
-                break;
-            case ECondition.Top:
-                Result = ECondition.Bottom;
-                break;
-            case ECondition.Bottom:
-                Result = ECondition.Top;
-                break;
-            case ECondition.Left:
-                Result = ECondition.Right;
-                break;
-            case ECondition.Right:
-                Result = ECondition.Left;
-                break;
-            default:
-                Result = ECondition.Any;
-                break;
-        }
-
-        return Result;
+        return cellCondition;
     }
 }

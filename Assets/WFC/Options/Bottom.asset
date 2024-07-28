@@ -15,6 +15,6 @@ MonoBehaviour:
   Prefab: {fileID: 8955380377237878220, guid: 75915d71af25f3a44887d52d94794880, type: 3}
   Condition:
     Top: 0
-    Bottom: 3
+    Bottom: 1
     Left: 0
     Right: 0

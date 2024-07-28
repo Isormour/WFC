@@ -1,11 +1,9 @@
 public enum ECondition
 {
     None,
+    Pass,
     Any,
-    Top,
-    Bottom,
-    Left,
-    Right,
+    Room
 }
 
 [System.Serializable]
@@ -24,11 +22,11 @@ public class CollapseCondition
     }
     public bool CheckCondition(CollapseCondition other)
     {
-        bool fits =
-        (this.Top == other.Top || (this.Top == ECondition.Any||other.Top == ECondition.Any)) &&
-        (this.Bottom == other.Bottom || (this.Bottom == ECondition.Any || other.Bottom == ECondition.Any)) &&
-        (this.Left == other.Left || (this.Left == ECondition.Any || other.Left == ECondition.Any)) &&
-        (this.Right == other.Right|| (this.Right == ECondition.Any || other.Right == ECondition.Any));
-        return fits;
+        bool tempTop = (this.Top == other.Top || this.Top == ECondition.Any || other.Top == ECondition.Any);
+        bool tempBottom = (this.Bottom == other.Bottom || this.Bottom == ECondition.Any || other.Bottom == ECondition.Any);
+        bool tempLeft = (this.Left == other.Left || this.Left == ECondition.Any || other.Left == ECondition.Any);
+        bool tempRight = (this.Right == other.Right || this.Right == ECondition.Any || other.Right == ECondition.Any);
+
+        return tempTop && tempBottom && tempLeft && tempRight;
     }
 }
