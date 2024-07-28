@@ -21,7 +21,7 @@ MonoBehaviour:
     Optionals:
     - dir: 0
       condition: 1
-    - dir: 3
+    - dir: 2
       condition: 1
   IsRotateable: 1
   IsSymetric: 0

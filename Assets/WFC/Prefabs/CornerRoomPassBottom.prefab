@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1548583898481397113, guid: 0a0b762789c8e954f9433ced5ad31866, type: 3}
       propertyPath: m_Name
-      value: CornerRoomPass
+      value: CornerRoomPassBottom
       objectReference: {fileID: 0}
     - target: {fileID: 2145907467795315905, guid: 0a0b762789c8e954f9433ced5ad31866, type: 3}
       propertyPath: m_LocalPosition.x

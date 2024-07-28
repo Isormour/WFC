@@ -32,7 +32,8 @@ public class CollapseCondition
     }
     public bool CheckAnySideCondition(ECondition condition)
     {
-        return Top == condition || Bottom == condition || Left == condition || Right == condition;
+        bool haveCondition = Top == condition || Bottom == condition || Left == condition || Right == condition;
+        return haveCondition;
     }
     public void RotateOptionals()
     {

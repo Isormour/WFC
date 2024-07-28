@@ -15,12 +15,12 @@ MonoBehaviour:
   Prefab: {fileID: 8955380377237878220, guid: da3001cc09f865f4398d873a3d509e2c, type: 3}
   Condition:
     Top: 0
-    Bottom: 0
+    Bottom: 3
     Left: 3
-    Right: 0
+    Right: 1
     Optionals:
-    - dir: 0
+    - dir: 1
       condition: 1
-    - dir: 2
+    - dir: 3
       condition: 1
   RotatedAngle: 180

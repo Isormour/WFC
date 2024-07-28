@@ -17,6 +17,6 @@ MonoBehaviour:
     Top: 0
     Bottom: 3
     Left: 0
-    Right: 0
+    Right: 3
     Optionals: []
   RotatedAngle: 90

@@ -16,11 +16,11 @@ MonoBehaviour:
   Condition:
     Top: 0
     Bottom: 3
-    Left: 0
-    Right: 0
+    Left: 1
+    Right: 3
     Optionals:
-    - dir: 3
+    - dir: 2
       condition: 1
-    - dir: 0
+    - dir: 1
       condition: 1
   RotatedAngle: 90

@@ -28,7 +28,11 @@ public class Cell
     {
         this.x = x;
         this.y = y;
-        this.collaspeOptions = options;
+        this.collaspeOptions = new CollapseOption[options.Length];
+        for (int i = 0; i < collaspeOptions.Length; i++)
+        {
+            collaspeOptions[i]= options[i];
+        }
         EntropyValue = options.Length;
     }
     public void SetNeighbours(Cell top, Cell bottom, Cell left, Cell right)
@@ -82,7 +86,12 @@ public class Cell
     }
     public void Collapse(Transform parent, CollapseOption[] options)
     {
-        List<CollapseOption> properOptions = FindProperOptions(options, GetCollapseCondition());
+        this.collaspeOptions = options;
+        Collapse(parent);
+    }
+    public void Collapse(Transform parent)
+    {
+        List<CollapseOption> properOptions = FindProperOptions(collaspeOptions, GetCollapseCondition());
         currentOption = properOptions[Random.Range(0, properOptions.Count)];
 
         GameObject cellInstance = GameObject.Instantiate(currentOption.Prefab);
@@ -94,10 +103,7 @@ public class Cell
         condition = currentOption.Condition;
         UpdateNeighbourEntropy();
     }
-    public void Collapse(Transform parent)
-    {
-        Collapse(parent,collaspeOptions);
-    }
+
 
     private void UpdateNeighbourEntropy()
     {
@@ -117,10 +123,10 @@ public class Cell
                     nBottom?.RemoveOptions(condition.Optionals[i].condition);
                     break;
                 case ECellDirection.East:
-                    nLeft?.RemoveOptions(condition.Optionals[i].condition);
+                    nRight?.RemoveOptions(condition.Optionals[i].condition);
                     break;
                 case ECellDirection.West:
-                    nRight?.RemoveOptions(condition.Optionals[i].condition);
+                    nLeft?.RemoveOptions(condition.Optionals[i].condition);
                     break;
                 default:
                     break;
@@ -129,15 +135,24 @@ public class Cell
     }
     public void RemoveOptions(ECondition condition)
     {
+        return;
         List<CollapseOption> tempOptions = new List<CollapseOption>();
         foreach (var item in collaspeOptions)
         {
-            if (!item.Condition.CheckAnySideCondition(condition))
+            bool neibhourRequire = false;
+            neibhourRequire =
+                nTop.condition.Bottom == condition ||
+                nBottom.condition.Bottom == condition ||
+                nRight.condition.Bottom == condition ||
+                nLeft.condition.Bottom == condition;
+            //!item.Condition.CheckAnySideCondition(condition)
+            if (neibhourRequire)
             {
                 tempOptions.Add(item);
             }
         }
-        this.collaspeOptions = tempOptions.ToArray();
+        //this.collaspeOptions = tempOptions.ToArray();
+    // todo: fix
     }
     private void UpdateEntropy()
     {

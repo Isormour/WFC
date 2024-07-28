@@ -8,7 +8,8 @@ using System;
 public class DungeonCreator : DungeonCreatorPage
 {
     bool drawOptions = false;
-    int gridSize = 10;
+    int width = 10;
+    int height = 10;
     public Cell[,] grid;
     List<Cell> cells;
     CollapseOptionGroup collapseOptionsborder;
@@ -40,10 +41,10 @@ public class DungeonCreator : DungeonCreatorPage
     {
         //fill grid
         cells = new List<Cell>();
-        grid = new Cell[gridSize, gridSize];
-        for (int i = 0; i < gridSize; i++)
+        grid = new Cell[width, height];
+        for (int i = 0; i < grid.GetLength(0); i++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
                 grid[i, j] = new Cell(i, j, this.collapseOptions);
                 cells.Add(grid[i, j]);
@@ -51,9 +52,9 @@ public class DungeonCreator : DungeonCreatorPage
         }
 
         // set neighbours;
-        for (int i = 0; i < gridSize; i++)
+        for (int i = 0; i < grid.GetLength(0); i++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
                 Cell top = GetCellFromGrid(i, j + 1);
                 Cell bottom = GetCellFromGrid(i, j - 1);
@@ -66,8 +67,8 @@ public class DungeonCreator : DungeonCreatorPage
     Cell GetCellFromGrid(int x, int y)
     {
         Cell cell = null;
-        bool xInRange = x >= 0 && x < gridSize;
-        bool yInRange = y >= 0 && y < gridSize;
+        bool xInRange = x >= 0 && x < grid.GetLength(0);
+        bool yInRange = y >= 0 && y < grid.GetLength(1);
         if (xInRange && yInRange)
         {
             cell = grid[x, y];
@@ -77,8 +78,10 @@ public class DungeonCreator : DungeonCreatorPage
     public override void Draw()
     {
         base.Draw();
+     
         collapseOptionsborder = (CollapseOptionGroup)EditorGUILayout.ObjectField("Border", collapseOptionsborder, typeof(CollapseOptionGroup), false);
-
+        width = EditorGUILayout.IntField("width", width);
+        height = EditorGUILayout.IntField("height", height);
         if (GUILayout.Button("Draw Options "+ collapseOptions.Length))
         {
             drawOptions = !drawOptions;
@@ -108,11 +111,11 @@ public class DungeonCreator : DungeonCreatorPage
             currentParent = new GameObject("dungeonParent").transform;
         }
 
-        for (int i = 0; i < gridSize; i++)
+        for (int i = 0; i < grid.GetLength(0); i++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
-                bool isBorder = i == 0 || j == 0 || j == gridSize - 1 || i == gridSize - 1;
+                bool isBorder = i == 0 || j == 0 || j == grid.GetLength(1) - 1 || i == grid.GetLength(0) - 1;
                 if (isBorder)
                 {
                     grid[i, j].Collapse(currentParent, collapseOptionsborder.Group);
@@ -138,7 +141,7 @@ public class DungeonCreator : DungeonCreatorPage
             currentParent = new GameObject("dungeonParent").transform;
         }
       
-        cells[0].Collapse(currentParent, collapseOptions);
+        cells[0].Collapse(currentParent);
         
         cells.RemoveAt(0);
         cells.OrderByDescending(c => c.EntropyValue);
@@ -146,6 +149,7 @@ public class DungeonCreator : DungeonCreatorPage
    
     void GenerateLoop()
     {
+        currentParent = new GameObject("dungeonParent").transform;
         InitGrid();
         GenerateBorder();
         while (cells.Count > 0)

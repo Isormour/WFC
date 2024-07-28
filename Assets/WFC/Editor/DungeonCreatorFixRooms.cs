@@ -67,6 +67,7 @@ public class DungeonCreatorFixRooms : DungeonCreatorPage
                 CellsToCheck.Remove(item);
             }
             Branches.Add(temp);
+            CellCount = CellsToCheck.Count;
         }
     }
     void GrowBranch(Cell cell,List<Cell>branch)
