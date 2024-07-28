@@ -19,7 +19,7 @@ MonoBehaviour:
     Left: 0
     Right: 3
     Optionals:
-    - dir: 1
+    - dir: 0
       condition: 1
     - dir: 3
       condition: 1
