@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prefab: {fileID: 8955380377237878220, guid: 72f9dcd87110003408d11c570fbd4d4b, type: 3}
   Condition:
-    Top: 0
-    Bottom: 3
-    Left: 1
-    Right: 3
+    Top: 2
+    Bottom: 8
+    Left: 4
+    Right: 16
     Optionals:
     - dir: 2
-      condition: 1
+      condition: 4
     - dir: 1
-      condition: 1
+      condition: 4
   RotatedAngle: 90

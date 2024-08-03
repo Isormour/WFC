@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: GroupBorder
   m_EditorClassIdentifier: 
   Group:
-  - {fileID: 11400000, guid: 8169bbb1d462d1c459101be9f6199275, type: 2}
+  - {fileID: 0}

@@ -12,7 +12,7 @@ public class DungeonCreatorFixRooms : DungeonCreatorPage
     {
         this.grid = grid;
         CellsToCheck = new List<Cell>();
-        ECondition[] connectedCond = new ECondition[] { ECondition.Pass, ECondition.Room };
+        ECondition[] connectedCond = new ECondition[] { ECondition.Pass, ECondition.RoomL,ECondition.RoomR };
 
         foreach (var item in grid)
         {
@@ -72,9 +72,12 @@ public class DungeonCreatorFixRooms : DungeonCreatorPage
     }
     void GrowBranch(Cell cell,List<Cell>branch)
     {
-        List<ECondition> ConnectedConditions = new List<ECondition>();
-        ConnectedConditions.Add(ECondition.Pass);
-        ConnectedConditions.Add(ECondition.Room);
+        List<ECondition> ConnectedConditions = new List<ECondition>
+        {
+            ECondition.Pass,
+            ECondition.RoomL,
+            ECondition.RoomR
+        };
 
         List<Cell> tempNeibhours = cell.GetConnectedNeibhours(ConnectedConditions);
 

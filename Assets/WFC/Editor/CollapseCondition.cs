@@ -1,9 +1,15 @@
+
+using System;
+using System.Diagnostics;
+
+[System.Flags]
 public enum ECondition
 {
-    None,
-    Pass,
-    Any,
-    Room
+    Wall =2,
+    Pass  =4,
+    RoomL =8,
+    RoomR =16,
+    Any = ~0,
 }
 
 [System.Serializable]
@@ -23,12 +29,24 @@ public class CollapseCondition
     }
     public bool CheckCondition(CollapseCondition other)
     {
-        bool tempTop = (this.Top == other.Top || this.Top == ECondition.Any || other.Top == ECondition.Any);
-        bool tempBottom = (this.Bottom == other.Bottom || this.Bottom == ECondition.Any || other.Bottom == ECondition.Any);
-        bool tempLeft = (this.Left == other.Left || this.Left == ECondition.Any || other.Left == ECondition.Any);
-        bool tempRight = (this.Right == other.Right || this.Right == ECondition.Any || other.Right == ECondition.Any);
+        bool tempTop = (CompareMask(Top,other.Top) || this.Top == ECondition.Any || other.Top == ECondition.Any);
+        bool tempBottom = (CompareMask(Bottom, other.Bottom) || this.Bottom == ECondition.Any || other.Bottom == ECondition.Any);
+        bool tempLeft = (CompareMask(Left, other.Left) || this.Left == ECondition.Any || other.Left == ECondition.Any);
+        bool tempRight = (CompareMask(Right, other.Right) || this.Right == ECondition.Any || other.Right == ECondition.Any);
 
         return tempTop && tempBottom && tempLeft && tempRight;
+    }
+   static bool CompareMask(Enum a,Enum b)
+    {
+
+        int aMask = DungeonCreatorWindow.condConfig.GetMask((ECondition)a);
+        ECondition aEnum = (ECondition)aMask;
+        int bMask = DungeonCreatorWindow.condConfig.GetMask((ECondition)b);
+        ECondition bEnum = (ECondition)bMask;
+
+        bool result = aEnum.HasFlag(b);
+        bool reverse = bEnum.HasFlag(a);
+        return result|| reverse;
     }
     public bool CheckAnySideCondition(ECondition condition)
     {
@@ -69,5 +87,10 @@ public class CollapseCondition
             temp[i].dir = Optionals[i].dir;
         }
         return temp;
+    }
+    public static bool CheckFitCondition(ECondition a, ECondition b)
+    {
+        return CompareMask(a,b);
+
     }
 }

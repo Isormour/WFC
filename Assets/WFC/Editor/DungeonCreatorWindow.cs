@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,9 +9,13 @@ public class DungeonCreatorWindow : EditorWindow
     OptionsManager optionsManager;
     DungeonCreator creator;
     DungeonCreatorFixRooms fixRooms;
+    ConditionConfigPage config;
+    TestingPage tests;
+    internal static ConditionsConfig condConfig;
     [MenuItem("Tools/Dungeon Creator")]
     public static void OpenWindow()
     {
+        condConfig = FindAsset<ConditionsConfig>("Assets/WFC/Conditions_Config.asset"); 
         DungeonCreatorWindow tempWindow = GetWindow<DungeonCreatorWindow>("Dungeon Creator");
         tempWindow.InitWindow();
         
@@ -26,6 +28,11 @@ public class DungeonCreatorWindow : EditorWindow
     private void OnGUI()
     {
         GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Condition config"))
+        {
+            config = new ConditionConfigPage("Condition Config");
+            ChangePage(config);
+        }
         if (GUILayout.Button("OptionsManager"))
         {
             optionsManager = new OptionsManager("Dungeon Creator");
@@ -42,6 +49,12 @@ public class DungeonCreatorWindow : EditorWindow
             fixRooms.SetGrid(creator.grid);
             ChangePage(fixRooms);
         }
+        if (GUILayout.Button("tests"))
+        {
+            tests = new TestingPage("Fix Rooms");
+            ChangePage(tests);
+        }
+
         GUILayout.EndHorizontal();
         GUILayout.Space(10);
 

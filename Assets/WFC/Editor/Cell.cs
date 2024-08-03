@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 using UnityEngine;
 
 public enum ECellDirection
@@ -21,7 +23,7 @@ public class Cell
     CollapseOption[] collaspeOptions;
     public CollapseCondition condition { private set; get; }
     public CollapseOption currentOption = null;
-  
+    bool collapsed = false;
     public GameObject CellObject { private set; get; }
 
     public Cell(int x, int y, CollapseOption[] options)
@@ -44,25 +46,27 @@ public class Cell
     }
     public List<Cell> GetConnectedNeibhours(List<ECondition> conds)
     {
+        ConditionsConfig.Condition[] configs = DungeonCreatorWindow.condConfig.conditions;
         List<Cell> neibhours = new List<Cell>();
-        if (nTop != null && conds.Contains(condition.Top) && condition.Top == nTop.condition.Bottom)
+        if (nTop != null && conds.Contains(condition.Top) && CollapseCondition.CheckFitCondition(condition.Top,nTop.condition.Bottom))
         {
             neibhours.Add(nTop);
         }
-        if (nBottom != null && conds.Contains(condition.Bottom) && condition.Bottom == nBottom.condition.Top)
+        if (nBottom != null && conds.Contains(condition.Bottom) && CollapseCondition.CheckFitCondition(condition.Bottom, nBottom.condition.Top))
         {
             neibhours.Add(nBottom);
         }
-        if (nLeft != null && conds.Contains(condition.Left)&& condition.Left == nLeft.condition.Right)
+        if (nLeft != null && conds.Contains(condition.Left)&& CollapseCondition.CheckFitCondition(condition.Left ,nLeft.condition.Right))
         {
             neibhours.Add(nLeft);
         }
-        if (nRight != null && conds.Contains(condition.Right) && condition.Right == nRight.condition.Left)
+        if (nRight != null && conds.Contains(condition.Right) && CollapseCondition.CheckFitCondition(condition.Right, nRight.condition.Left))
         {
             neibhours.Add(nRight);
         }
         return neibhours;
     }
+
     public List<Cell> GetNeibhoursWithCondition(ECondition cond)
     {
         List<Cell> neibhours = new List<Cell>();
@@ -92,7 +96,7 @@ public class Cell
     public void Collapse(Transform parent)
     {
         List<CollapseOption> properOptions = FindProperOptions(collaspeOptions, GetCollapseCondition());
-        currentOption = properOptions[Random.Range(0, properOptions.Count)];
+        currentOption = properOptions[UnityEngine.Random.Range(0, properOptions.Count)];
 
         GameObject cellInstance = GameObject.Instantiate(currentOption.Prefab);
         cellInstance.transform.localPosition = new Vector3(x, 0, y);
@@ -101,16 +105,19 @@ public class Cell
         cellInstance.name = currentOption.name;
         CellObject = cellInstance;
         condition = currentOption.Condition;
+        collapsed = true;
         UpdateNeighbourEntropy();
     }
 
 
     private void UpdateNeighbourEntropy()
     {
-        this.nTop?.UpdateEntropy();
-        this.nBottom?.UpdateEntropy();
-        this.nLeft?.UpdateEntropy();
-        this.nRight?.UpdateEntropy();
+        if (!this.nTop?.collapsed ?? false) this.nTop.UpdateEntropy();
+        if (!this.nBottom?.collapsed ?? false) this.nBottom.UpdateEntropy();
+        if (!this.nLeft?.collapsed ?? false) this.nLeft.UpdateEntropy();
+        if (!this.nRight?.collapsed ?? false) this.nRight.UpdateEntropy();
+
+        if (condition.Optionals == null) return;
 
         for (int i = 0; i < condition.Optionals.Length; i++)
         {
@@ -135,37 +142,39 @@ public class Cell
     }
     public void RemoveOptions(ECondition condition)
     {
-        return;
         List<CollapseOption> tempOptions = new List<CollapseOption>();
         foreach (var item in collaspeOptions)
         {
-            bool neibhourRequire = false;
-            neibhourRequire =
-                nTop.condition.Bottom == condition ||
-                nBottom.condition.Bottom == condition ||
-                nRight.condition.Bottom == condition ||
-                nLeft.condition.Bottom == condition;
-            //!item.Condition.CheckAnySideCondition(condition)
-            if (neibhourRequire)
+            bool topRequire = nTop?.condition?.Bottom == condition;
+            bool bottomRequire = nBottom?.condition?.Top == condition;
+            bool leftRequire = nLeft?.condition?.Right == condition;
+            bool rightRequire = nRight?.condition?.Left == condition;
+
+            bool neibhourRequire = topRequire || bottomRequire || leftRequire || rightRequire;
+            
+            
+            if (neibhourRequire || !item.Condition.CheckAnySideCondition(condition))
             {
                 tempOptions.Add(item);
             }
         }
-        //this.collaspeOptions = tempOptions.ToArray();
-    // todo: fix
+        this.collaspeOptions = tempOptions.ToArray();
+        UpdateEntropy();
     }
     private void UpdateEntropy()
     {
+      
         collaspeOptions = FindProperOptions(collaspeOptions, GetCollapseCondition()).ToArray();
         EntropyValue = collaspeOptions.Length;
     }
     private CollapseCondition GetCollapseCondition()
     {
-        ECondition top = CheckNeighbhourCondition(this.nTop, ECellDirection.North);
-        ECondition bottom = CheckNeighbhourCondition(this.nBottom, ECellDirection.South);
-        ECondition left = CheckNeighbhourCondition(this.nLeft, ECellDirection.East);
-        ECondition right = CheckNeighbhourCondition(this.nRight, ECellDirection.West);
-        CollapseCondition cond = new CollapseCondition(top, bottom, left, right);
+        Enum top = CheckNeighbhourCondition(this.nTop, ECellDirection.North);
+        Enum bottom = CheckNeighbhourCondition(this.nBottom, ECellDirection.South);
+        Enum left = CheckNeighbhourCondition(this.nLeft, ECellDirection.West);
+        Enum right = CheckNeighbhourCondition(this.nRight, ECellDirection.East);
+        CollapseCondition cond = new CollapseCondition((ECondition)top, (ECondition)bottom, (ECondition)left, (ECondition)right);
+
         return cond;
     }
     public List<CollapseOption> FindProperOptions(CollapseOption[] options, CollapseCondition cond)
@@ -175,14 +184,15 @@ public class Cell
         {
             if (options[i].Condition.CheckCondition(cond))
             {
+                
                 tempOptions.Add(options[i]);
             }
         }
         return tempOptions;
     }
-    ECondition CheckNeighbhourCondition(Cell cell, ECellDirection dir)
+    Enum CheckNeighbhourCondition(Cell cell, ECellDirection dir)
     {
-        ECondition cellCondition = ECondition.Any;
+        Enum cellCondition = ECondition.Any;
         if (cell == null || cell.condition == null)
         {
             return ECondition.Any;
@@ -190,16 +200,16 @@ public class Cell
         switch (dir)
         {
             case ECellDirection.North:
-                cellCondition = cell.condition.Bottom;
+                cellCondition = cell.currentOption.Condition.Bottom;
                 break;
             case ECellDirection.South:
-                cellCondition = cell.condition.Top;
+                cellCondition = cell.currentOption.Condition.Top;
                 break;
             case ECellDirection.East:
-                cellCondition = cell.condition.Right;
+                cellCondition = cell.currentOption.Condition.Left;
                 break;
             case ECellDirection.West:
-                cellCondition = cell.condition.Left;
+                cellCondition = cell.currentOption.Condition.Right;
                 break;
             default:
                 break;

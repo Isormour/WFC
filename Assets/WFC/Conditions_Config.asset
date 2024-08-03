@@ -9,12 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4cd21f45a011555428e0b7648138a79c, type: 3}
-  m_Name: RoomBottom
+  m_Script: {fileID: 11500000, guid: 425d812a1b855234d902df3cedc5519d, type: 3}
+  m_Name: Conditions_Config
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 8955380377237878220, guid: 529ac7f06351307479db0645b1f4d388, type: 3}
-  Condition:
-    Top: 0
-    Bottom: 0
-    Left: 3
-    Right: 3
+  conditions:
+  - condition: 16
+    Mask: 8
+  - condition: -1
+    Mask: -1
+  - condition: 4
+    Mask: 4
+  - condition: 2
+    Mask: 2
+  - condition: 8
+    Mask: 16

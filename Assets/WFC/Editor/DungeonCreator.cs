@@ -12,11 +12,11 @@ public class DungeonCreator : DungeonCreatorPage
     int height = 10;
     public Cell[,] grid;
     List<Cell> cells;
-    CollapseOptionGroup collapseOptionsborder;
+    CollapseOption collapseOptionsborder;
     CollapseOption[] collapseOptions;
     int tempX = 0, tempY = 0;
     Transform currentParent;
-
+    
     public DungeonCreator(string name) : base(name)
     {
     }
@@ -32,7 +32,7 @@ public class DungeonCreator : DungeonCreatorPage
     public override void InitPage()
     {
         collapseOptions = DungeonCreatorWindow.FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
-        collapseOptionsborder = DungeonCreatorWindow.FindAsset<CollapseOptionGroup>("Assets/WFC/GroupBorder.asset");
+        collapseOptionsborder = collapseOptions[0];
         InitGrid();
     }
     
@@ -79,7 +79,7 @@ public class DungeonCreator : DungeonCreatorPage
     {
         base.Draw();
      
-        collapseOptionsborder = (CollapseOptionGroup)EditorGUILayout.ObjectField("Border", collapseOptionsborder, typeof(CollapseOptionGroup), false);
+        collapseOptionsborder = (CollapseOption)EditorGUILayout.ObjectField("Border", collapseOptionsborder, typeof(CollapseOption), false);
         width = EditorGUILayout.IntField("width", width);
         height = EditorGUILayout.IntField("height", height);
         if (GUILayout.Button("Draw Options "+ collapseOptions.Length))
@@ -110,7 +110,7 @@ public class DungeonCreator : DungeonCreatorPage
         {
             currentParent = new GameObject("dungeonParent").transform;
         }
-
+        InitGrid();
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
@@ -118,7 +118,7 @@ public class DungeonCreator : DungeonCreatorPage
                 bool isBorder = i == 0 || j == 0 || j == grid.GetLength(1) - 1 || i == grid.GetLength(0) - 1;
                 if (isBorder)
                 {
-                    grid[i, j].Collapse(currentParent, collapseOptionsborder.Group);
+                    grid[i, j].Collapse(currentParent,new CollapseOption[1] { collapseOptionsborder });
                     cells.Remove(grid[i, j]);
                     cells.OrderByDescending(c => c.EntropyValue);
                 }
@@ -144,7 +144,7 @@ public class DungeonCreator : DungeonCreatorPage
         cells[0].Collapse(currentParent);
         
         cells.RemoveAt(0);
-        cells.OrderByDescending(c => c.EntropyValue);
+        cells = cells.OrderBy(c => c.EntropyValue).ToList();
     }
    
     void GenerateLoop()

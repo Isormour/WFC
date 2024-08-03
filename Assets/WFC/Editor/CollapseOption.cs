@@ -9,3 +9,4 @@ public class CollapseOption : ScriptableObject
     public CollapseCondition Condition;
     public int RotatedAngle = 0;
 }
+
