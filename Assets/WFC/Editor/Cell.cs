@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Policy;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum ECellDirection
@@ -215,5 +216,14 @@ public class Cell
                 break;
         }
         return cellCondition;
+    }
+
+    internal void Destroy()
+    {
+#if UNITY_EDITOR
+        GameObject.DestroyImmediate(CellObject);
+#else
+        GameObject.Destroy(CellObject);
+#endif
     }
 }

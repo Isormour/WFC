@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,11 +12,20 @@ public class DungeonCreatorWindow : EditorWindow
     DungeonCreatorFixRooms fixRooms;
     ConditionConfigPage config;
     TestingPage tests;
-    internal static ConditionsConfig condConfig;
+    private static ConditionsConfig _config;
+    internal static ConditionsConfig condConfig {
+        get {
+            if (_config == null)
+            {
+                _config = FindAsset<ConditionsConfig>("Assets/WFC/Conditions_Config.asset");
+            }
+            return _config;
+        } 
+    }
     [MenuItem("Tools/Dungeon Creator")]
     public static void OpenWindow()
     {
-        condConfig = FindAsset<ConditionsConfig>("Assets/WFC/Conditions_Config.asset"); 
+        _config = FindAsset<ConditionsConfig>("Assets/WFC/Conditions_Config.asset"); 
         DungeonCreatorWindow tempWindow = GetWindow<DungeonCreatorWindow>("Dungeon Creator");
         tempWindow.InitWindow();
         
@@ -23,6 +33,7 @@ public class DungeonCreatorWindow : EditorWindow
     void InitWindow()
     {
         creator = new DungeonCreator("Dungeon Creator");
+        creator.onGridCreated += OnGridCreated;
         ChangePage(creator);
     }
     private void OnGUI()
@@ -35,18 +46,19 @@ public class DungeonCreatorWindow : EditorWindow
         }
         if (GUILayout.Button("OptionsManager"))
         {
-            optionsManager = new OptionsManager("Dungeon Creator");
+            optionsManager = new OptionsManager("Options");
             ChangePage(optionsManager);
         }
         if (GUILayout.Button("Generation"))
         {
             creator = new DungeonCreator("Dungeon Creator");
+            creator.onGridCreated += OnGridCreated;
             ChangePage(creator);
         }
         if (GUILayout.Button("Fix Rooms"))
         {
             fixRooms = new DungeonCreatorFixRooms("Fix Rooms");
-            fixRooms.SetGrid(creator.grid);
+            fixRooms.SetGrid(creator.grid,creator.currentParent);
             ChangePage(fixRooms);
         }
         if (GUILayout.Button("tests"))
@@ -58,8 +70,27 @@ public class DungeonCreatorWindow : EditorWindow
         GUILayout.EndHorizontal();
         GUILayout.Space(10);
 
+        if (GUILayout.Button("Generate"))
+        {
+            creator = new DungeonCreator("Dungeon Creator");
+            creator.InitPage();
+            creator.GenerateAll();
+            fixRooms = new DungeonCreatorFixRooms("Fix Rooms");
+            fixRooms.SetGrid(creator.grid, creator.currentParent);
+            ChangePage(fixRooms);
+        }
+
         currentPage.Draw();
     }
+
+    private void OnGridCreated()
+    {
+        creator.onGridCreated -= OnGridCreated;
+        fixRooms = new DungeonCreatorFixRooms("Fix Rooms");
+        fixRooms.SetGrid(creator.grid, creator.currentParent);
+        ChangePage(fixRooms);
+    }
+
     public void ChangePage(DungeonCreatorPage page)
     {
         currentPage = page;

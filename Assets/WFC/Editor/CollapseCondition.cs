@@ -9,6 +9,7 @@ public enum ECondition
     Pass  =4,
     RoomL =8,
     RoomR =16,
+    Room = 32,
     Any = ~0,
 }
 
@@ -92,5 +93,14 @@ public class CollapseCondition
     {
         return CompareMask(a,b);
 
+    }
+    public int GetConditionAmount(ECondition cond)
+    {
+        int amount = 0;
+        if (CheckFitCondition(Top, cond)) amount++;
+        if (CheckFitCondition(Bottom, cond)) amount++;
+        if (CheckFitCondition(Left, cond)) amount++;
+        if (CheckFitCondition(Right, cond)) amount++;
+        return amount;
     }
 }

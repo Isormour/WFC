@@ -15,7 +15,9 @@ public class DungeonCreator : DungeonCreatorPage
     CollapseOption collapseOptionsborder;
     CollapseOption[] collapseOptions;
     int tempX = 0, tempY = 0;
-    Transform currentParent;
+    public event Action onGridCreated;
+
+    public Transform currentParent { private set; get; }
     
     public DungeonCreator(string name) : base(name)
     {
@@ -100,7 +102,8 @@ public class DungeonCreator : DungeonCreatorPage
         }
         if (GUILayout.Button("Create All"))
         {
-            GenerateLoop();
+            GenerateAll();
+            onGridCreated?.Invoke();
         }
     }
 
@@ -147,7 +150,7 @@ public class DungeonCreator : DungeonCreatorPage
         cells = cells.OrderBy(c => c.EntropyValue).ToList();
     }
    
-    void GenerateLoop()
+   public void GenerateAll()
     {
         currentParent = new GameObject("dungeonParent").transform;
         InitGrid();

@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f655237b366348469e77254fe6c35ad, type: 3}
-  m_Name: CornerRoomPassLeft
+  m_Name: RoomWall
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 8955380377237878220, guid: da3001cc09f865f4398d873a3d509e2c, type: 3}
+  Prefab: {fileID: 8955380377237878220, guid: 34bf3a77805e32346bf69ddd2dcc83fb, type: 3}
   Condition:
-    Top: 16
+    Top: 32
     Bottom: 2
-    Left: 4
+    Left: 16
     Right: 8
     Optionals:
-    - dir: 0
-      condition: 4
     - dir: 2
-      condition: 4
+      condition: 32
+    - dir: 3
+      condition: 32
   IsRotateable: 1
   IsSymetric: 0

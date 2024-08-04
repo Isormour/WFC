@@ -23,3 +23,5 @@ MonoBehaviour:
     Mask: 2
   - condition: 8
     Mask: 16
+  - condition: 32
+    Mask: 32
