@@ -89,22 +89,25 @@ namespace WFC
             }
             return neibhours;
         }
-        public void Collapse(Transform parent, CollapseOption[] options)
+        public void Collapse(Transform parent, CollapseOption[] options,bool createWorldObject)
         {
             this.collaspeOptions = options;
-            Collapse(parent);
+            Collapse(parent, createWorldObject);
         }
-        public void Collapse(Transform parent)
+        public void Collapse(Transform parent,bool createWorldObject)
         {
             List<CollapseOption> properOptions = FindProperOptions(collaspeOptions, GetCollapseCondition());
             currentOption = properOptions[UnityEngine.Random.Range(0, properOptions.Count)];
 
-            GameObject cellInstance = GameObject.Instantiate(currentOption.Prefab);
-            cellInstance.transform.localPosition = new Vector3(x, 0, y);
-            cellInstance.transform.localRotation = Quaternion.Euler(0, currentOption.RotatedAngle, 0);
-            cellInstance.transform.SetParent(parent);
-            cellInstance.name = currentOption.name;
-            CellObject = cellInstance;
+            if (createWorldObject)
+            {
+                GameObject cellInstance = GameObject.Instantiate(currentOption.Prefab);
+                cellInstance.transform.localPosition = new Vector3(x, 0, y);
+                cellInstance.transform.localRotation = Quaternion.Euler(0, currentOption.RotatedAngle, 0);
+                cellInstance.transform.SetParent(parent);
+                cellInstance.name = currentOption.name;
+                CellObject = cellInstance;
+            }
             condition = currentOption.Condition;
             collapsed = true;
             UpdateNeighbourEntropy();

@@ -5,39 +5,23 @@ using System.Linq;
 using System;
 using WFC;
 
-public class DungeonCreator : DungeonCreatorPage
+public class DungeonCreator
 {
-    bool drawOptions = false;
-    int width = 10;
-    int height = 10;
+    public int width = 10;
+    public int height = 10;
     public Cell[,] grid;
-    List<Cell> cells;
-    CollapseOption collapseOptionsborder;
-    CollapseOption[] collapseOptions;
+    public List<Cell> cells;
+    public CollapseOption[] collapseOptions;
     int tempX = 0, tempY = 0;
     public event Action onGridCreated;
 
     public Transform currentParent { private set; get; }
     
-    public DungeonCreator(string name) : base(name)
+    public DungeonCreator(CollapseOption[] collapseOptions)
     {
-    }
-
-
-    //[MenuItem("Tools/Dungeon Creator")]
-    public static void OpenWindow()
-    {
-
-
-    }
-
-    public override void InitPage()
-    {
-        collapseOptions = DungeonCreatorWindow.FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
-        collapseOptionsborder = collapseOptions[0];
+        this.collapseOptions = collapseOptions;
         InitGrid();
     }
-    
 
     void InitGrid()
     {
@@ -77,37 +61,9 @@ public class DungeonCreator : DungeonCreatorPage
         }
         return cell;
     }
-    public override void Draw()
-    {
-        base.Draw();
-     
-        collapseOptionsborder = (CollapseOption)EditorGUILayout.ObjectField("Border", collapseOptionsborder, typeof(CollapseOption), false);
-        width = EditorGUILayout.IntField("width", width);
-        height = EditorGUILayout.IntField("height", height);
-        if (GUILayout.Button("Draw Options "+ collapseOptions.Length))
-        {
-            drawOptions = !drawOptions;
-        }
-        if (drawOptions) DrawProperties();
+   
 
-
-        if (GUILayout.Button("CollapseBorder"))
-        {
-            GenerateBorder();
-        }
-
-        if (GUILayout.Button("Create Single"))
-        {
-            Generate();
-        }
-        if (GUILayout.Button("Create All"))
-        {
-            GenerateAll();
-            onGridCreated?.Invoke();
-        }
-    }
-
-    private void GenerateBorder()
+    public void GenerateBorder()
     {
         if (currentParent == null)
         {
@@ -121,19 +77,14 @@ public class DungeonCreator : DungeonCreatorPage
                 bool isBorder = i == 0 || j == 0 || j == grid.GetLength(1) - 1 || i == grid.GetLength(0) - 1;
                 if (isBorder)
                 {
-                    grid[i, j].Collapse(currentParent,new CollapseOption[1] { collapseOptionsborder });
+                    grid[i, j].Collapse(currentParent,new CollapseOption[1] { collapseOptions[0] },false);
                     cells.Remove(grid[i, j]);
                     cells.OrderByDescending(c => c.EntropyValue);
                 }
             }
         }
     }
-
-    private void Generate()
-    {
-        SingleGenerationEntropy();
-    }
-    void SingleGenerationEntropy()
+   public  void Generate(bool createWorldObject)
     {
         if (cells.Count == 0)
         {
@@ -144,27 +95,20 @@ public class DungeonCreator : DungeonCreatorPage
             currentParent = new GameObject("dungeonParent").transform;
         }
       
-        cells[0].Collapse(currentParent);
+        cells[0].Collapse(currentParent, createWorldObject);
         
         cells.RemoveAt(0);
         cells = cells.OrderBy(c => c.EntropyValue).ToList();
     }
    
-   public void GenerateAll()
+   public void GenerateAll(bool createWorldObject)
     {
         currentParent = new GameObject("dungeonParent").transform;
         InitGrid();
         GenerateBorder();
         while (cells.Count > 0)
         {
-            SingleGenerationEntropy();
-        }
-    }
-    void DrawProperties()
-    {
-        for (int i = 0; i < collapseOptions.Length; i++)
-        {
-            collapseOptions[i] = (CollapseOption)EditorGUILayout.ObjectField(collapseOptions[i], typeof(CollapseOption), false);
+            Generate(createWorldObject);
         }
     }
 }

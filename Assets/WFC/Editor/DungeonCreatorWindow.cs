@@ -7,7 +7,7 @@ public class DungeonCreatorWindow : EditorWindow
 {
     DungeonCreatorPage currentPage;
     OptionsManager optionsManager;
-    DungeonCreator creator;
+    DungeonCreationPage creatorPage;
     DungeonCreatorFixRooms fixRooms;
     ConditionConfigPage config;
     TestingPage tests;
@@ -32,18 +32,20 @@ public class DungeonCreatorWindow : EditorWindow
     }
     void InitWindow()
     {
-        creator = new DungeonCreator("Dungeon Creator");
-        creator.onGridCreated += OnGridCreated;
-        dungeonManagerObject = FindAsset<GameObject>("Assets/WFC/Prefabs/DungeonManager.prefab");
+        CollapseOption[] options = FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
+        dungeonManagerObject = Instantiate(FindAsset<GameObject>("Assets/WFC/Prefabs/DungeonManager.prefab"));
         dungeonManagerObject.GetComponent<DungeonManager>().Initialize();
-        ChangePage(creator);
+        creatorPage = new DungeonCreationPage("Dungeon Creator", options);
+        creatorPage.onGridCreated += OnGridCreated;
+        creatorPage.GenerateAll();
+        ChangePage(creatorPage);
     
     }
     private void OnDestroy()
     {
         if (dungeonManagerObject != null)
         {
-            Destroy(dungeonManagerObject);
+            DestroyImmediate(dungeonManagerObject);
             dungeonManagerObject = null;
         }
     }
@@ -62,14 +64,15 @@ public class DungeonCreatorWindow : EditorWindow
         }
         if (GUILayout.Button("Generation"))
         {
-            creator = new DungeonCreator("Dungeon Creator");
-            creator.onGridCreated += OnGridCreated;
-            ChangePage(creator);
+            CollapseOption[] options = FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
+            creatorPage = new DungeonCreationPage("Dungeon Creator", options);
+            creatorPage.onGridCreated += OnGridCreated;
+            ChangePage(creatorPage);
         }
         if (GUILayout.Button("Fix Rooms"))
         {
             fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
-            fixRooms.SetGrid(creator.grid,creator.currentParent);
+            fixRooms.SetGrid(creatorPage.creator.grid,creatorPage.creator.currentParent);
             ChangePage(fixRooms);
         }
         if (GUILayout.Button("tests"))
@@ -83,11 +86,10 @@ public class DungeonCreatorWindow : EditorWindow
 
         if (GUILayout.Button("Generate"))
         {
-            creator = new DungeonCreator("Dungeon Creator");
-            creator.InitPage();
-            creator.GenerateAll();
+            CollapseOption[] options = FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
+            creatorPage = new DungeonCreationPage("Dungeon Creator", options);
             fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
-            fixRooms.SetGrid(creator.grid, creator.currentParent);
+            fixRooms.SetGrid(creatorPage.creator.grid, creatorPage.creator.currentParent);
             ChangePage(fixRooms);
         }
 
@@ -96,9 +98,9 @@ public class DungeonCreatorWindow : EditorWindow
 
     private void OnGridCreated()
     {
-        creator.onGridCreated -= OnGridCreated;
+        creatorPage.onGridCreated -= OnGridCreated;
         fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
-        fixRooms.SetGrid(creator.grid, creator.currentParent);
+        fixRooms.SetGrid(creatorPage.creator.grid, creatorPage.creator.currentParent);
         ChangePage(fixRooms);
     }
 
