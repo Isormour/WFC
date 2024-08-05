@@ -1,9 +1,7 @@
 ﻿using System;
-using Unity.VisualScripting.FullSerializer;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
-
+using WFC;
 internal class ConditionConfigPage : DungeonCreatorPage
 {
     ConditionsConfig config;

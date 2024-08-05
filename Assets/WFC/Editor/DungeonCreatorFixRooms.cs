@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
+using WFC;
 
-public class DungeonCreatorFixRooms : DungeonCreatorPage
+public partial class DungeonCreatorFixRooms : DungeonCreatorPage
 {
     List<Cell> CellsToCheck;
     List<Branch> dungeonBranches;
     Transform dungeonParent;
     Cell[,] grid;
-    public DungeonCreatorFixRooms(string name) : base(name)
+    ConditionsConfig.Condition[] conditions;
+    public DungeonCreatorFixRooms(string name, ConditionsConfig.Condition[] conditions) : base(name)
     {
+        this.conditions = conditions;
     }
     public void SetGrid(Cell[,] grid, Transform mainParent)
     {
@@ -131,7 +134,7 @@ public class DungeonCreatorFixRooms : DungeonCreatorPage
             Color col = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
             foreach (var item in temp)
             {
-                ColorCellObject(col, item);
+                DungeonManager.ColorCellObject(col, item);
                 CellsToCheck.Remove(item);
             }
             branches.Add(new Branch(temp));
@@ -141,14 +144,6 @@ public class DungeonCreatorFixRooms : DungeonCreatorPage
         return branches;
     }
 
-    private static void ColorCellObject(Color col, Cell item)
-    {
-        MeshRenderer[] rends = item.CellObject.GetComponentsInChildren<MeshRenderer>();
-        foreach (var rend in rends)
-        {
-            rend.material.color = rend.material.color * col;
-        }
-    }
     public static Vector3 MultiplyVector(Vector3 a, Vector3 b)
     {
         Vector3 result = a;
@@ -176,109 +171,6 @@ public class DungeonCreatorFixRooms : DungeonCreatorPage
                 branch.Add(item);
                 GrowBranch(item, branch);
             }
-        }
-    }
-    class Branch
-    {
-        public List<Cell> cells { private set; get; }
-        public Transform rootObject;
-        public Cell StairsCell { private set; get; }
-        public Branch(List<Cell> cells)
-        {
-            this.cells = cells;
-        }
-        public void FindEnterAndExit()
-        {
-            Cell stairsCell = cells[0];
-            Cell exitCell = cells[1];
-            //find entry branch
-
-            List<Cell> singleRooms = FindAllCellsWithConditions(new List<ECondition> { ECondition.Pass, ECondition.Wall }, new List<int> { 1, 3 });
-            List<Cell> otherRooms = FindAllCellsWithConditions(new List<ECondition> { ECondition.Pass }, new List<int> { 2 });
-
-            if (singleRooms.Count > 0)
-            {
-                stairsCell = singleRooms[Random.Range(0, singleRooms.Count)];
-                singleRooms.Remove(stairsCell);
-            }
-            else if (otherRooms.Count > 0)
-            {
-                stairsCell = otherRooms[Random.Range(0, otherRooms.Count)];
-                otherRooms.Remove(stairsCell);
-            }
-
-            cells.Remove(stairsCell);
-            cells.Insert(0, stairsCell);
-
-            Color col = stairsCell.CellObject.GetComponentsInChildren<MeshRenderer>()[1].material.color;
-            ColorCellObject(col + (col * 0.5f), stairsCell);
-
-            if (singleRooms.Count > 0)
-            {
-                exitCell = singleRooms[Random.Range(0, singleRooms.Count)];
-                singleRooms.Remove(exitCell);
-            }
-            else if (otherRooms.Count > 0)
-            {
-                exitCell = otherRooms[Random.Range(0, otherRooms.Count)];
-                otherRooms.Remove(exitCell);
-            }
-
-            cells.Remove(exitCell);
-            cells.Insert(0, exitCell);
-
-            cells.Remove(stairsCell);
-            cells.Insert(0, stairsCell);
-
-            ColorCellObject(col - (col * 0.5f), exitCell);
-            StairsCell = stairsCell;
-        }
-
-        List<Cell> FindAllCellsWithConditions(List<ECondition> conds, List<int> numberOfOccurances)
-        {
-            List<Cell> fits = new List<Cell>();
-            for (int i = 0; i < cells.Count; i++)
-            {
-                fits.Add(cells[i]);
-                for (int j = 0; j < conds.Count; j++)
-                {
-                    if (cells[i].condition.GetConditionAmount(conds[j]) == numberOfOccurances[j])
-                    {
-                        continue;
-                    }
-                    if (fits.Contains(cells[i]))
-                    {
-                        fits.Remove(cells[i]);
-                        break;
-                    }
-                }
-            }
-            return fits;
-        }
-        internal void CreateContainer(Transform MainParent, string name)
-        {
-            GameObject branchParent = new GameObject(name);
-            branchParent.transform.position = StairsCell.CellObject.transform.position;
-            branchParent.transform.SetParent(MainParent);
-            rootObject = branchParent.transform;
-        }
-
-        internal void ReparentCells()
-        {
-            foreach (var cell in cells)
-            {
-                cell.CellObject.transform.SetParent(rootObject);
-            }
-        }
-
-        internal void Destroy()
-        {
-#if UNITY_EDITOR
-            foreach (Cell cell in cells)
-            {
-                cell.Destroy();
-            }
-#endif
         }
     }
 }

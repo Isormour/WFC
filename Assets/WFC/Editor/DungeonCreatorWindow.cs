@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-
+using WFC;
 public class DungeonCreatorWindow : EditorWindow
 {
     DungeonCreatorPage currentPage;
@@ -12,6 +11,7 @@ public class DungeonCreatorWindow : EditorWindow
     DungeonCreatorFixRooms fixRooms;
     ConditionConfigPage config;
     TestingPage tests;
+    GameObject dungeonManagerObject;
     private static ConditionsConfig _config;
     internal static ConditionsConfig condConfig {
         get {
@@ -34,7 +34,18 @@ public class DungeonCreatorWindow : EditorWindow
     {
         creator = new DungeonCreator("Dungeon Creator");
         creator.onGridCreated += OnGridCreated;
+        dungeonManagerObject = FindAsset<GameObject>("Assets/WFC/Prefabs/DungeonManager.prefab");
+        dungeonManagerObject.GetComponent<DungeonManager>().Initialize();
         ChangePage(creator);
+    
+    }
+    private void OnDestroy()
+    {
+        if (dungeonManagerObject != null)
+        {
+            Destroy(dungeonManagerObject);
+            dungeonManagerObject = null;
+        }
     }
     private void OnGUI()
     {
@@ -57,7 +68,7 @@ public class DungeonCreatorWindow : EditorWindow
         }
         if (GUILayout.Button("Fix Rooms"))
         {
-            fixRooms = new DungeonCreatorFixRooms("Fix Rooms");
+            fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
             fixRooms.SetGrid(creator.grid,creator.currentParent);
             ChangePage(fixRooms);
         }
@@ -75,7 +86,7 @@ public class DungeonCreatorWindow : EditorWindow
             creator = new DungeonCreator("Dungeon Creator");
             creator.InitPage();
             creator.GenerateAll();
-            fixRooms = new DungeonCreatorFixRooms("Fix Rooms");
+            fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
             fixRooms.SetGrid(creator.grid, creator.currentParent);
             ChangePage(fixRooms);
         }
@@ -86,7 +97,7 @@ public class DungeonCreatorWindow : EditorWindow
     private void OnGridCreated()
     {
         creator.onGridCreated -= OnGridCreated;
-        fixRooms = new DungeonCreatorFixRooms("Fix Rooms");
+        fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
         fixRooms.SetGrid(creator.grid, creator.currentParent);
         ChangePage(fixRooms);
     }
