@@ -24,7 +24,7 @@ namespace WFC
         CollapseOption[] collaspeOptions;
         public CollapseCondition condition { private set; get; }
         public CollapseOption currentOption = null;
-        bool collapsed = false;
+        public bool collapsed { private set; get; } = false;
         public GameObject CellObject { private set; get; }
 
         public Cell(int x, int y, CollapseOption[] options)
@@ -105,7 +105,7 @@ namespace WFC
                 cellInstance.transform.localPosition = new Vector3(x, 0, y);
                 cellInstance.transform.localRotation = Quaternion.Euler(0, currentOption.RotatedAngle, 0);
                 cellInstance.transform.SetParent(parent);
-                cellInstance.name = currentOption.name;
+                cellInstance.name = currentOption.name+"_x"+x+"y"+y;
                 CellObject = cellInstance;
             }
             condition = currentOption.Condition;
@@ -171,7 +171,7 @@ namespace WFC
             collaspeOptions = FindProperOptions(collaspeOptions, GetCollapseCondition()).ToArray();
             EntropyValue = collaspeOptions.Length;
         }
-        private CollapseCondition GetCollapseCondition()
+        public CollapseCondition GetCollapseCondition()
         {
             Enum top = CheckNeighbhourCondition(this.nTop, ECellDirection.North);
             Enum bottom = CheckNeighbhourCondition(this.nBottom, ECellDirection.South);

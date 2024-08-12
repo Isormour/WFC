@@ -57,6 +57,7 @@ namespace WFC
 
             DungeonManager.ColorCellObject(col - (col * 0.5f), exitCell);
             StairsCell = stairsCell;
+            
         }
 
         List<Cell> FindAllCellsWithConditions(List<ECondition> conds, List<int> numberOfOccurances)
@@ -104,6 +105,19 @@ namespace WFC
                 cell.Destroy();
             }
 #endif
+        }
+       public static void GrowBranch(Cell cell, List<Cell> branch, List<ECondition> conds)
+        {
+            List<Cell> tempNeibhours = cell.GetConnectedNeibhours(conds);
+
+            foreach (var item in tempNeibhours)
+            {
+                if (!branch.Contains(item))
+                {
+                    branch.Add(item);
+                    GrowBranch(item, branch,conds);
+                }
+            }
         }
     }
 }

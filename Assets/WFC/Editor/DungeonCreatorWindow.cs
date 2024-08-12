@@ -10,9 +10,11 @@ public class DungeonCreatorWindow : EditorWindow
     DungeonCreationPage creatorPage;
     DungeonCreatorFixRooms fixRooms;
     ConditionConfigPage config;
+    DungeonRoomInterpreterPage interpreter;
     TestingPage tests;
     GameObject dungeonManagerObject;
     private static ConditionsConfig _config;
+    DungeonManager dungeonManager;
     internal static ConditionsConfig condConfig {
         get {
             if (_config == null)
@@ -33,13 +35,19 @@ public class DungeonCreatorWindow : EditorWindow
     void InitWindow()
     {
         CollapseOption[] options = FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
-        dungeonManagerObject = Instantiate(FindAsset<GameObject>("Assets/WFC/Prefabs/DungeonManager.prefab"));
-        dungeonManagerObject.GetComponent<DungeonManager>().Initialize();
-        creatorPage = new DungeonCreationPage("Dungeon Creator", options);
-        creatorPage.onGridCreated += OnGridCreated;
-        creatorPage.GenerateAll();
-        ChangePage(creatorPage);
-    
+        dungeonManagerObject = Instantiate(FindAsset<GameObject>("Assets/WFC/DungeonManager.prefab"));
+        
+        dungeonManager = dungeonManagerObject.GetComponent<DungeonManager>();
+
+        DungeonProfile profile = new DungeonProfile();
+        profile.requrementsData = FindAsset<DungeonRequirments>("Assets/WFC/Restrictions/Basic.asset");
+        dungeonManager.Initialize(profile);
+        dungeonManager.CreateDungeon(true);
+        creatorPage = new DungeonCreationPage("Dungeon Creator", dungeonManager);
+        fixRooms = new DungeonCreatorFixRooms("Fix Rooms", dungeonManager);
+        interpreter = new DungeonRoomInterpreterPage("Interpreter", dungeonManager);
+        ChangePage(interpreter);
+        dungeonManager.SaveDungeon();
     }
     private void OnDestroy()
     {
@@ -65,15 +73,18 @@ public class DungeonCreatorWindow : EditorWindow
         if (GUILayout.Button("Generation"))
         {
             CollapseOption[] options = FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
-            creatorPage = new DungeonCreationPage("Dungeon Creator", options);
-            creatorPage.onGridCreated += OnGridCreated;
+            creatorPage = new DungeonCreationPage("Dungeon Creator", dungeonManager);
             ChangePage(creatorPage);
         }
         if (GUILayout.Button("Fix Rooms"))
         {
-            fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
-            fixRooms.SetGrid(creatorPage.creator.grid,creatorPage.creator.currentParent);
+            fixRooms = new DungeonCreatorFixRooms("Fix Rooms", dungeonManager);
             ChangePage(fixRooms);
+        }
+        if (GUILayout.Button("RoomInterpreter"))
+        {
+            interpreter = new DungeonRoomInterpreterPage("Room Interpreter", dungeonManager);
+            ChangePage(interpreter);
         }
         if (GUILayout.Button("tests"))
         {
@@ -87,21 +98,12 @@ public class DungeonCreatorWindow : EditorWindow
         if (GUILayout.Button("Generate"))
         {
             CollapseOption[] options = FindAssets<CollapseOption>("Assets/WFC/GeneratedOptions/").ToArray();
-            creatorPage = new DungeonCreationPage("Dungeon Creator", options);
-            fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
-            fixRooms.SetGrid(creatorPage.creator.grid, creatorPage.creator.currentParent);
+            creatorPage = new DungeonCreationPage("Dungeon Creator", dungeonManager);
+            fixRooms = new DungeonCreatorFixRooms("Fix Rooms", dungeonManager);
             ChangePage(fixRooms);
         }
 
         currentPage.Draw();
-    }
-
-    private void OnGridCreated()
-    {
-        creatorPage.onGridCreated -= OnGridCreated;
-        fixRooms = new DungeonCreatorFixRooms("Fix Rooms", condConfig.conditions);
-        fixRooms.SetGrid(creatorPage.creator.grid, creatorPage.creator.currentParent);
-        ChangePage(fixRooms);
     }
 
     public void ChangePage(DungeonCreatorPage page)

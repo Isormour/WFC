@@ -5,14 +5,14 @@ using WFC;
 
 internal class DungeonCreationPage : DungeonCreatorPage
 {
-    internal Action onGridCreated;
     private string v;
-    public DungeonCreator creator { private set; get; }
+    public DungeonManager  dungeonManager{ private set; get; }
     bool drawOptions = false;
-    public DungeonCreationPage(string v, CollapseOption[] options):base(v)
+    public DungeonCreationPage(string v,DungeonManager manager):base(v)
     {
         this.v = v;
-        creator = new DungeonCreator(options);
+        this.dungeonManager = manager;
+
     }
     public override void InitPage()
     {
@@ -22,9 +22,8 @@ internal class DungeonCreationPage : DungeonCreatorPage
     {
         base.Draw();
 
-        creator.width = EditorGUILayout.IntField("width", creator.width);
-        creator.height = EditorGUILayout.IntField("height", creator.height);
-        if (GUILayout.Button("Draw Options " + creator.collapseOptions.Length))
+      
+        if (GUILayout.Button("Draw Options " + dungeonManager.conditionConfig.conditions.Length))
         {
             drawOptions = !drawOptions;
         }
@@ -33,29 +32,28 @@ internal class DungeonCreationPage : DungeonCreatorPage
 
         if (GUILayout.Button("CollapseBorder"))
         {
-            creator.GenerateBorder();
+            dungeonManager.creator.GenerateBorder();
         }
 
         if (GUILayout.Button("Create Single"))
         {
-            creator.Generate(true);
+            dungeonManager.creator.Generate(true);
         }
         if (GUILayout.Button("Create All"))
         {
-            creator.GenerateAll(true);
-            onGridCreated?.Invoke();
+            GenerateAll();
         }
     }
     public void GenerateAll()
     {
-        creator.GenerateAll(true);
-        onGridCreated?.Invoke();
+        dungeonManager.creator.GenerateAll(true);
     }
     void DrawProperties()
     {
-        for (int i = 0; i < creator.collapseOptions.Length; i++)
+        CollapseOption[] options = dungeonManager.creator.collapseOptions;
+        for (int i = 0; i < options.Length; i++)
         {
-            creator.collapseOptions[i] = (CollapseOption)EditorGUILayout.ObjectField(creator.collapseOptions[i], typeof(CollapseOption), false);
+            options[i] = (CollapseOption)EditorGUILayout.ObjectField(options[i], typeof(CollapseOption), false);
         }
     }
 }
